@@ -30,7 +30,7 @@
                     <DataGridTextColumn Binding="{Binding PhoneNumber}" Header="Номер телефона" Width="110">
                         <DataGridTextColumn.EditingElementStyle>
                             <Style TargetType="{x:Type TextBox}">
-                                <Setter Property="MaxLength" Value="10"/>
+                                <Setter Property="MaxLength" Value="11"/>
                             </Style>
                         </DataGridTextColumn.EditingElementStyle>
                     </DataGridTextColumn>

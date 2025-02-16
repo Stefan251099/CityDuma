@@ -1,10 +1,10 @@
-﻿using CityDuma.Domain.Dto;
+﻿using CityDuma.Commands;
+using CityDuma.Domain.Dto;
 using CityDuma.Entities;
-using Microsoft.EntityFrameworkCore;
+using CityDuma.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
 
@@ -14,6 +14,8 @@ namespace CityDuma.ViewModels
     {
         private AppDbContext _dbContext;
         private ObservableCollection<MeetingsDto> _meetings;
+        private readonly ShowErrorCommand _showErrorCommand;
+
         public ObservableCollection<MeetingsDto> Meetings
         {
             get => _meetings;
@@ -89,12 +91,12 @@ namespace CityDuma.ViewModels
             }
         }
 
-
         public ICommand DeleteMemberCommand { get; set; }
         public ICommand SaveChangesCommand { get; set; }
         public ICommand AddMeetingCommand { get; set; }
+        public ICommand ShowErrorCommand => _showErrorCommand;
 
-        public MeetingsViewModel()
+        public MeetingsViewModel(IErrorDialogService errorDialogService)
         {
             _dbContext = new AppDbContext();
 
@@ -132,16 +134,21 @@ namespace CityDuma.ViewModels
             Organizers = new ObservableCollection<OrganizersDto>(organizers);
             Meetings = new ObservableCollection<MeetingsDto>(meetings);
 
-
-
             SaveChangesCommand = new RelayCommand(SaveChanges);
             DeleteMemberCommand = new RelayCommand(DeleteMeeting, CanDeleteMeeting);
             AddMeetingCommand = new RelayCommand(AddMeeting);
 
+            _showErrorCommand = new ShowErrorCommand(errorDialogService);
         }
 
         private void AddMeeting()
         {
+            if (Commissions.Count == 0 || Organizers.Count == 0)
+            {
+                _showErrorCommand.Execute("Перед созданием заседания нужно добавить коммиссии и организаторов!");
+                return;
+            }
+
             var newMeeting = new MeetingsDto
             {
                 Commission = Commissions.FirstOrDefault(),
@@ -163,6 +170,8 @@ namespace CityDuma.ViewModels
 
             newMeeting.MeetingCode = meetingEntity.MeetingCode;
         }
+
+
 
         private void SaveChanges()
         {

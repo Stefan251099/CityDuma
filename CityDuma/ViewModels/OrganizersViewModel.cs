@@ -83,23 +83,29 @@ namespace CityDuma.ViewModels
 
         private void SaveChanges()
         {
-            foreach (var item in Organizers)
+            try
             {
-                var organizer = _dbContext.Organizers.FirstOrDefault(m => m.OrganizerCode == item.OrganizerCode);
-
-                if (organizer != null)
+                foreach (var item in Organizers)
                 {
-                    string[] fullNameParts = item.OrganizerFullName.Split(' ');
-                    organizer.LastName = fullNameParts[0];
-                    organizer.FirstName = fullNameParts[1];
-                    organizer.Patronymic = fullNameParts[2];
-                    organizer.BirthDate = item.BirthDate;
-                    organizer.PhoneNumber = item.PhoneNumber;
-                }
+                    var organizer = _dbContext.Organizers.FirstOrDefault(m => m.OrganizerCode == item.OrganizerCode);
 
+                    if (organizer != null)
+                    {
+                        string[] fullNameParts = item.OrganizerFullName.Split(' ');
+                        organizer.LastName = fullNameParts[0];
+                        organizer.FirstName = fullNameParts[1];
+                        organizer.Patronymic = fullNameParts[2];
+                        organizer.BirthDate = item.BirthDate;
+                        organizer.PhoneNumber = item.PhoneNumber;
+                    }
+
+                    _dbContext.SaveChanges();
+                }
+            }
+            catch
+            {
                 _dbContext.SaveChanges();
             }
-
         }
 
         private bool CanDeleteOrganizer() => SelectedOrganizer != null;

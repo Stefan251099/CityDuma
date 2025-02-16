@@ -82,6 +82,12 @@ namespace CityDuma.ViewModels
         #region Commission commands
         private void AddCommission()
         {
+            if (_dbContext.MembersDuma.Count() == 0)
+            {
+                _showErrorCommand.Execute("Перед созданием комиссии нужно добавить хотя бы одного члена думы!");
+                return;
+            }
+            
             var newCommission = new CommissionsDto
             {
                 Direction = "Новое направление", 
